@@ -21,9 +21,11 @@ import { ChatState } from "../Context/ChatProvider";
 import { getSender } from "../config/ChatLogics";
 import ScrollableChat from "./ScrollableChat";
 
-const ENDPOINT = process.env.NODE_ENV === "production"
-  ? "/"
-  : "http://localhost:5000";
+const ENDPOINT =
+  process.env.NODE_ENV === "production"
+    ? "/"
+    : "http://localhost:5000";
+
 let socket;
 let selectedChatCompare;
 
@@ -46,6 +48,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const toast = useToast();
 
+  // ---------------- SOCKET SETUP ----------------
   useEffect(() => {
     if (!user) return;
 
@@ -60,6 +63,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     return () => socket.disconnect();
   }, [user]);
 
+  // ---------------- FETCH MESSAGES ----------------
   const fetchMessages = useCallback(async () => {
     if (!selectedChat) return;
 
@@ -89,6 +93,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   }, [selectedChat, user, toast]);
 
+  // ---------------- SEND MESSAGE ----------------
   const sendMessage = async (e) => {
     if (e.key !== "Enter" || !newMessage.trim()) return;
 
@@ -110,6 +115,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
 
       setNewMessage("");
+
+      // ✅ IMPORTANT FIX — update sender's own messages instantly
+      setMessages((prev) => [...prev, data]);
+
       socket.emit("new message", data);
 
     } catch {
@@ -120,6 +129,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  // ---------------- TYPING HANDLER ----------------
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
@@ -140,6 +150,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  // ---------------- RECEIVE MESSAGE ----------------
   useEffect(() => {
     if (!socket) return;
 
@@ -148,7 +159,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        // Notification logic
+        // Notification
         if (!notification.includes(newMessageReceived)) {
           setNotification([newMessageReceived, ...notification]);
           setFetchAgain(!fetchAgain);
@@ -210,6 +221,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             </Text>
           </Box>
 
+          {/* MESSAGES */}
           <Box
             flex="1"
             display="flex"
@@ -239,6 +251,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
           </Box>
 
+          {/* INPUT */}
           <FormControl onKeyDown={sendMessage} mt={2}>
             <Input
               placeholder="Enter a message..."
