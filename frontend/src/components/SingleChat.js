@@ -21,7 +21,9 @@ import { ChatState } from "../Context/ChatProvider";
 import { getSender } from "../config/ChatLogics";
 import ScrollableChat from "./ScrollableChat";
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = process.env.NODE_ENV === "production"
+  ? "/"
+  : "http://localhost:5000";
 let socket;
 let selectedChatCompare;
 
