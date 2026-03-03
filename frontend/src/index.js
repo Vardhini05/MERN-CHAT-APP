@@ -6,9 +6,6 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import ChatProvider from "./Context/ChatProvider";
 
-// ✅ IMPORT SERVICE WORKER
-import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -21,7 +18,4 @@ root.render(
       </ChatProvider>
     </BrowserRouter>
   </React.StrictMode>
-);
-
-// ✅ REGISTER SERVICE WORKER
-serviceWorkerRegistration.register();
+); 
